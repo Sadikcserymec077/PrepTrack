@@ -11,7 +11,7 @@ router.get("/", verifyToken, async (req, res) => {
         const topics = await Topic.find({ userId: req.user.uid }).sort({ createdAt: -1 });
         res.json(topics);
     } catch (err) {
-        res.status(500).json({ error: "Failed to fetch topics" });
+        res.status(500).json({ error: "Failed to fetch topics: " + err.message });
     }
 });
 
