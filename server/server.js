@@ -44,6 +44,7 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/topics", require("./routes/topics"));
 app.use("/api/progress", require("./routes/progress"));
 app.use("/api/calendar", require("./routes/calendar"));
+app.use("/api/ai", require("./routes/ai"));
 
 // ─── Health Check ─────────────────────────────────────────────
 app.get("/", (req, res) => {

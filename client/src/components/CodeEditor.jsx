@@ -5,15 +5,17 @@ import {
     CheckCircle2, XCircle, Clock, Cpu,
 } from "lucide-react";
 
-// ─── Piston API config (free, no key needed) ──────────────────
-const PISTON_URL = "https://emkc.org/api/v2/piston/execute";
+// ─── Judge0 RapidAPI config ──────────────────
+const JUDGE0_URL = "https://judge029.p.rapidapi.com/submissions?base64_encoded=false&wait=true";
+const RAPIDAPI_KEY = "e49db6e9e2mshec7307f807db8f8p10deb8jsn5ec4e09da89b";
+const RAPIDAPI_HOST = "judge029.p.rapidapi.com";
 
 const LANGUAGES = [
-    { id: "python", label: "Python", monacoLang: "python", version: "3.10.0", boilerplate: `# Python Solution\ndef solution():\n    # Write your solution here\n    pass\n\nsolution()` },
-    { id: "java", label: "Java", monacoLang: "java", version: "15.0.2", boilerplate: `// Java Solution\npublic class Main {\n    public static void main(String[] args) {\n        // Write your solution here\n        System.out.println("Hello, World!");\n    }\n}` },
-    { id: "cpp", label: "C++", monacoLang: "cpp", version: "10.2.0", boilerplate: `// C++ Solution\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    // Write your solution here\n    cout << "Hello, World!" << endl;\n    return 0;\n}` },
-    { id: "c", label: "C", monacoLang: "c", version: "10.2.0", boilerplate: `// C Solution\n#include <stdio.h>\n\nint main() {\n    // Write your solution here\n    printf("Hello, World!\\n");\n    return 0;\n}` },
-    { id: "javascript", label: "JavaScript", monacoLang: "javascript", version: "18.15.0", boilerplate: `// JavaScript Solution\nfunction solution() {\n    // Write your solution here\n    console.log("Hello, World!");\n}\n\nsolution();` },
+    { id: 71, label: "Python", monacoLang: "python", boilerplate: `# Python Solution\ndef solution():\n    # Write your solution here\n    pass\n\nsolution()` },
+    { id: 62, label: "Java", monacoLang: "java", boilerplate: `// Java Solution\npublic class Main {\n    public static void main(String[] args) {\n        // Write your solution here\n        System.out.println("Hello, World!");\n    }\n}` },
+    { id: 54, label: "C++", monacoLang: "cpp", boilerplate: `// C++ Solution\n#include <iostream>\nusing namespace std;\n\nint main() {\n    // Write your solution here\n    cout << "Hello, World!" << endl;\n    return 0;\n}` },
+    { id: 50, label: "C", monacoLang: "c", boilerplate: `// C Solution\n#include <stdio.h>\n\nint main() {\n    // Write your solution here\n    printf("Hello, World!\\n");\n    return 0;\n}` },
+    { id: 93, label: "JavaScript", monacoLang: "javascript", boilerplate: `// JavaScript Solution\nfunction solution() {\n    // Write your solution here\n    console.log("Hello, World!");\n}\n\nsolution();` },
 ];
 
 const STATUS_COLORS = {
@@ -53,28 +55,32 @@ const CodeEditor = ({ initialCode = "", onCodeChange, topicName = "" }) => {
 
         const startTime = performance.now();
         try {
-            const response = await fetch(PISTON_URL, {
+            const response = await fetch(JUDGE0_URL, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-rapidapi-key": RAPIDAPI_KEY,
+                    "x-rapidapi-host": RAPIDAPI_HOST
+                },
                 body: JSON.stringify({
-                    language: selectedLang.id,
-                    version: selectedLang.version,
-                    files: [{ name: selectedLang.id === "java" ? "Main.java" : `solution.${selectedLang.id === "cpp" ? "cpp" : selectedLang.id === "javascript" ? "js" : selectedLang.id}`, content: code }],
-                    stdin: stdin,
+                    language_id: selectedLang.id,
+                    source_code: code,
+                    stdin: stdin || ""
                 }),
             });
 
             const data = await response.json();
             const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
 
-            const stdout = data.run?.stdout || "";
-            const stderr = data.run?.stderr || data.compile?.stderr || data.message || "";
-            const exitCode = data.message ? 1 : (data.run?.code ?? data.compile?.code ?? 1);
+            const stdout = data.stdout || "";
+            const stderr = data.stderr || data.compile_output || data.message || "";
+            const statusId = data.status?.id;
 
-            if (exitCode !== 0 || stderr) {
-                setOutput({ type: "error", content: stderr || stdout, elapsed, exitCode });
+            if (statusId !== 3 || stderr) {
+                // 3 is usually "Accepted" in Judge0
+                setOutput({ type: "error", content: stderr || stdout || data.status?.description || "Execution Failed", elapsed, exitCode: statusId });
             } else {
-                setOutput({ type: "success", content: stdout || "(No output)", elapsed, exitCode });
+                setOutput({ type: "success", content: stdout || "(No output)", elapsed, exitCode: 0 });
             }
         } catch (err) {
             setOutput({ type: "error", content: `Network error: ${err.message}\n\nMake sure you have internet access.`, elapsed: 0, exitCode: 1 });
@@ -113,7 +119,7 @@ const CodeEditor = ({ initialCode = "", onCodeChange, topicName = "" }) => {
                         onMouseLeave={e => e.currentTarget.style.borderColor = "#30363d"}
                     >
                         <span style={{ fontSize: "15px" }}>
-                            {selectedLang.id === "python" ? "🐍" : selectedLang.id === "java" ? "☕" : selectedLang.id === "cpp" ? "⚡" : selectedLang.id === "c" ? "🔧" : "🟨"}
+                            {selectedLang.id === 71 ? "🐍" : selectedLang.id === 62 ? "☕" : selectedLang.id === 54 ? "⚡" : selectedLang.id === 50 ? "🔧" : "🟨"}
                         </span>
                         {selectedLang.label}
                         <ChevronDown size={13} />
@@ -125,7 +131,7 @@ const CodeEditor = ({ initialCode = "", onCodeChange, topicName = "" }) => {
                                     style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%", padding: "9px 14px", background: selectedLang.id === lang.id ? "#21262d" : "none", border: "none", color: selectedLang.id === lang.id ? "#818cf8" : "#c9d1d9", fontSize: "13px", fontWeight: 500, cursor: "pointer", transition: "background .15s" }}
                                     onMouseEnter={e => e.currentTarget.style.background = "#21262d"}
                                     onMouseLeave={e => { if (selectedLang.id !== lang.id) e.currentTarget.style.background = "none"; }}>
-                                    <span>{lang.id === "python" ? "🐍" : lang.id === "java" ? "☕" : lang.id === "cpp" ? "⚡" : lang.id === "c" ? "🔧" : "🟨"}</span>
+                                    <span>{lang.id === 71 ? "🐍" : lang.id === 62 ? "☕" : lang.id === 54 ? "⚡" : lang.id === 50 ? "🔧" : "🟨"}</span>
                                     {lang.label}
                                 </button>
                             ))}
@@ -179,7 +185,7 @@ const CodeEditor = ({ initialCode = "", onCodeChange, topicName = "" }) => {
                     padding: { top: 12, bottom: 12 },
                     cursorSmoothCaretAnimation: "on",
                     smoothScrolling: true,
-                    tabSize: selectedLang.id === "python" ? 4 : 2,
+                    tabSize: selectedLang.id === 71 ? 4 : 2,
                     wordWrap: "on",
                     automaticLayout: true,
                     bracketPairColorization: { enabled: true },

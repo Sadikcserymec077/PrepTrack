@@ -5,7 +5,7 @@ import "react-quill-new/dist/quill.snow.css";
 import { motion } from "framer-motion";
 import api from "../../utils/api";
 import CodeEditor from "../../components/CodeEditor";
-import { ArrowLeft, CheckCircle2, RotateCcw, Clock, Target, CalendarDays, Loader2, Save, Youtube, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, RotateCcw, Clock, Target, CalendarDays, Loader2, Save, Youtube, Plus, Trash2, Sparkles } from "lucide-react";
 
 const DIFFICULTY_COLOR = { "Easy": "#4ade80", "Medium": "#facc15", "Hard": "#f87171" };
 
@@ -47,6 +47,36 @@ const TopicDetail = () => {
         questions: []
     });
     const [activeQIndex, setActiveQIndex] = useState(-1);
+    const [isAiLoading, setIsAiLoading] = useState(false);
+
+    const askAiForHelp = async (q, index) => {
+        setIsAiLoading(true);
+        try {
+            const res = await api.post("/api/ai/summarize", {
+                title: q.title,
+                difficulty: q.difficulty,
+                codeSolution: q.codeSolution,
+                input: q.input,
+                output: q.output
+            });
+
+            setFormData(prev => {
+                const updated = [...prev.questions];
+                const existingQ = updated[index];
+                updated[index] = {
+                    ...existingQ,
+                    approachHTML: (existingQ.approachHTML || "") + res.data.approachHTML,
+                    edgeCasesHTML: (existingQ.edgeCasesHTML || "") + res.data.edgeCasesHTML
+                };
+                return { ...prev, questions: updated };
+            });
+        } catch (err) {
+            console.error(err);
+            alert("Failed to analyze code. Make sure GEMINI_API_KEY is configured on the backend!");
+        } finally {
+            setIsAiLoading(false);
+        }
+    };
 
     const fetchTopic = useCallback(async () => {
         try {
@@ -286,7 +316,13 @@ const TopicDetail = () => {
                                         {/* Rich Text Fields & I/O Grid */}
                                         <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
                                             <div>
-                                                <h3 style={{ color: "white", marginBottom: "12px", fontWeight: 700, fontSize: "16px" }}>🧠 Approach / Intuition</h3>
+                                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+                                                    <h3 style={{ color: "white", fontWeight: 700, fontSize: "16px", margin: 0 }}>🧠 Approach / Intuition</h3>
+                                                    <button onClick={() => askAiForHelp(q, activeQIndex)} disabled={isAiLoading} style={{ display: "flex", alignItems: "center", gap: "6px", background: "linear-gradient(to right, #6366f1, #a855f7)", color: "white", border: "none", padding: "6px 14px", borderRadius: "20px", fontSize: "13px", fontWeight: 600, cursor: isAiLoading ? "not-allowed" : "pointer", opacity: isAiLoading ? 0.7 : 1 }}>
+                                                        {isAiLoading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                                                        {isAiLoading ? "Analyzing Code..." : "Ask AI to Summarize"}
+                                                    </button>
+                                                </div>
                                                 <ReactQuill theme="snow" value={q.approachHTML} onChange={val => updateActiveQuestion("approachHTML", val)} modules={modules} placeholder="Write down the step by step intuition used to solve this problem..." />
                                             </div>
 
