@@ -56,7 +56,7 @@ const Login = () => {
                     <h1 className="text-4xl font-bold text-white mb-4">PrepTrack</h1>
                     <p className="text-brand-200 text-lg max-w-xs">Your AI-powered placement preparation companion</p>
                     <div className="mt-10 space-y-4">
-                        {["Track DSA, Aptitude & more", "Smart weak topic detection", "Study streaks & analytics"].map((item, i) => (
+                        {["Track DSA, numerical ability & more", "Smart weak topic detection", "Study streaks & analytics"].map((item, i) => (
                             <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.1 }}
                                 className="flex items-center gap-3 text-brand-100">
                                 <div className="w-5 h-5 rounded-full bg-white/30 flex items-center justify-center text-xs">✓</div>

@@ -5,7 +5,7 @@ const TopicSchema = new mongoose.Schema({
     subjectName: {
         type: String,
         required: true,
-        enum: ["DSA", "Aptitude", "Logical Reasoning", "Verbal", "Core"],
+        enum: ["DSA", "numerical ability", "Logical Reasoning", "Verbal", "Core"],
     },
     topicName: { type: String, required: true },
     totalQuestions: { type: Number, default: 0 },

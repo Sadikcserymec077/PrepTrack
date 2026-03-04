@@ -178,7 +178,7 @@ const CalendarPage = () => {
                             </div>
                             <div>
                                 <label className="label">Topics Covered (comma-separated)</label>
-                                <input type="text" placeholder="Arrays, Recursion, Aptitude" value={form.topicsCovered} onChange={e => setForm({ ...form, topicsCovered: e.target.value })} className="input" />
+                                <input type="text" placeholder="Arrays, Recursion, numerical ability" value={form.topicsCovered} onChange={e => setForm({ ...form, topicsCovered: e.target.value })} className="input" />
                             </div>
                             <div>
                                 <label className="label">Notes (optional)</label>

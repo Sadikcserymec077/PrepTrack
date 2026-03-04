@@ -4,14 +4,14 @@ import { Link, useSearchParams } from "react-router-dom";
 import api from "../../utils/api";
 import { Plus, Pencil, Trash2, X, BookOpen, CheckCircle, Search, ClipboardList } from "lucide-react";
 
-const SUBJECTS = ["DSA", "Aptitude", "Logical Reasoning", "Verbal", "Core"];
+const SUBJECTS = ["DSA", "numerical ability", "Logical Reasoning", "Verbal", "Core"];
 const DIFFICULTIES = ["Easy", "Medium", "Hard"];
 
-const SUBJECT_BG = { "DSA": "#4f46e5", "Aptitude": "#059669", "Logical Reasoning": "#7c3aed", "Verbal": "#db2777", "Core": "#ea580c" };
+const SUBJECT_BG = { "DSA": "#4f46e5", "numerical ability": "#059669", "Logical Reasoning": "#7c3aed", "Verbal": "#db2777", "Core": "#ea580c" };
 const DIFFICULTY_COLOR = { "Easy": "#4ade80", "Medium": "#facc15", "Hard": "#f87171" };
 
 const KNOWN_TOPICS = [
-    // Aptitude
+    // numerical ability
     "Percentages", "Averages", "Probability", "Partnership", "Simple & Compound Interest",
     "Profit and Loss", "Ages", "Boats and Streams", "Time Speed Distance", "Ratio and proportion",
     "Problems on Trains", "Data Interpretation", "Pipes and Cisterns", "Time & Work", "Progressions",
