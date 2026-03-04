@@ -171,13 +171,13 @@ const TopicDetail = () => {
         <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px 60px" }}>
 
             {/* ─── Breadcrumb & Save Bar ─── */}
-            <div className="top-bar-container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "24px 0", position: "sticky", top: 0, background: "rgba(3,7,18,0.8)", backdropFilter: "blur(12px)", padding: "16px 0", zIndex: 30, borderBottom: "1px solid #1f2937" }}>
-                <button onClick={() => navigate("/topics")} style={{ display: "flex", alignItems: "center", gap: "8px", color: "#9ca3af", background: "none", border: "none", cursor: "pointer", fontSize: "14px", fontWeight: 600 }}>
+            <div className="top-bar-container flex flex-wrap items-center justify-between gap-4 my-6 sticky top-0 z-50 border-b border-gray-800 pb-4 pt-4" style={{ background: "rgba(3,7,18,0.8)", backdropFilter: "blur(12px)" }}>
+                <button onClick={() => navigate("/topics")} className="flex items-center gap-2 text-gray-400 bg-transparent border-none cursor-pointer text-sm font-semibold hover:text-white transition-colors">
                     <ArrowLeft size={16} /> Back to Topics
                 </button>
-                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                    {lastSavedTime && <span style={{ color: "#6b7280", fontSize: "13px" }}>Last saved: {lastSavedTime}</span>}
-                    <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div className="flex items-center gap-4 flex-wrap">
+                    {lastSavedTime && <span className="text-gray-500 text-xs hidden sm:inline">Last saved: {lastSavedTime}</span>}
+                    <button onClick={handleSave} disabled={saving} className="btn-primary flex items-center gap-2 whitespace-nowrap text-sm px-4 py-2">
                         {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                         {saving ? "Saving..." : "Save Notes"}
                     </button>
@@ -266,7 +266,7 @@ const TopicDetail = () => {
                 {activeTab === "questions" && (
                     <div style={{ display: "flex", gap: "24px", minHeight: "500px", alignItems: "flex-start", flexWrap: "wrap" }}>
                         {/* Sidebar */}
-                        <div style={{ flex: "1 1 250px", maxWidth: "300px", background: "#111827", borderRadius: "12px", border: "1px solid #1f2937", padding: "16px", display: "flex", flexDirection: "column", gap: "12px", position: "sticky", top: "80px" }}>
+                        <div className="w-full lg:max-w-[300px] lg:sticky lg:top-[80px]" style={{ flex: "1 1 250px", background: "#111827", borderRadius: "12px", border: "1px solid #1f2937", padding: "16px", display: "flex", flexDirection: "column", gap: "12px", zIndex: 10 }}>
                             <button onClick={addNewQuestion} className="btn-primary" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", width: "100%", height: "40px" }}>
                                 <Plus size={16} /> Add New Problem
                             </button>
@@ -284,7 +284,7 @@ const TopicDetail = () => {
                         </div>
 
                         {/* Question Editor */}
-                        <div style={{ flex: "2 1 500px", display: "flex", flexDirection: "column", gap: "24px", padding: "16px", background: "#111827", borderRadius: "12px", border: "1px solid #1f2937" }}>
+                        <div className="w-full" style={{ flex: "2 1 500px", display: "flex", flexDirection: "column", gap: "24px", padding: "16px", background: "#111827", borderRadius: "12px", border: "1px solid #1f2937" }}>
                             {activeQIndex >= 0 && formData.questions[activeQIndex] ? (() => {
                                 const q = formData.questions[activeQIndex];
                                 return (
@@ -327,7 +327,7 @@ const TopicDetail = () => {
                                             </div>
 
                                             {/* Side by side Input/Output and Edge Cases */}
-                                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                                                 <div>
                                                     <h3 style={{ color: "white", marginBottom: "12px", fontWeight: 700, fontSize: "16px" }}>📝 Input & Output</h3>
                                                     <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
