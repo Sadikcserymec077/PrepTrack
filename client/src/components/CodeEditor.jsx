@@ -7,7 +7,7 @@ import {
 
 // ─── Judge0 RapidAPI config ──────────────────
 const JUDGE0_URL = "https://judge029.p.rapidapi.com/submissions?base64_encoded=false&wait=true";
-const RAPIDAPI_KEY = "e49db6e9e2mshec7307f807db8f8p10deb8jsn5ec4e09da89b";
+const RAPIDAPI_KEY = import.meta.env.VITE_RAPIDAPI_KEY || "";
 const RAPIDAPI_HOST = "judge029.p.rapidapi.com";
 
 const LANGUAGES = [

@@ -51,6 +51,10 @@ app.get("/", (req, res) => {
     res.json({ message: "PrepTrack API is running 🚀", mongoStatus: mongoose.connection.readyState === 1 ? "connected" : "disconnected" });
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server listening on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== "production") {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server listening on port ${PORT}`);
+    });
+}
+
+module.exports = app;
