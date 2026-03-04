@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import api from "../../utils/api";
-import { Plus, Pencil, Trash2, X, BookOpen, CheckCircle, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, X, BookOpen, CheckCircle, Search, ClipboardList } from "lucide-react";
 
 const SUBJECTS = ["DSA", "Aptitude", "Logical Reasoning", "Verbal", "Core"];
 const DIFFICULTIES = ["Easy", "Medium", "Hard"];
@@ -59,9 +59,26 @@ const Topics = () => {
     const [showModal, setShowModal] = useState(false);
     const [editTopic, setEditTopic] = useState(null);
     const [form, setForm] = useState(defaultForm);
-    const [activeSubject, setActiveSubject] = useState("All");
+    const [searchParams, setSearchParams] = useSearchParams();
+    const urlSubject = searchParams.get("subject") || "All";
+    const [activeSubject, setActiveSubject] = useState(urlSubject);
     const [saving, setSaving] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+
+    // Update active subject when URL changes
+    useEffect(() => {
+        setActiveSubject(urlSubject);
+    }, [urlSubject]);
+
+    // Update URL when active subject changes via tabs
+    const handleSubjectChange = (subject) => {
+        setActiveSubject(subject);
+        if (subject === "All") {
+            setSearchParams({});
+        } else {
+            setSearchParams({ subject });
+        }
+    };
     const [error, setError] = useState("");
 
     const fetchTopics = useCallback(async () => {
@@ -131,15 +148,17 @@ const Topics = () => {
             {/* Header & Controls */}
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", flexWrap: "wrap", gap: "16px" }}>
                 <div>
-                    <h1 style={{ fontSize: "32px", fontWeight: 800, color: "white", margin: 0, letterSpacing: "-0.02em" }}>📚 Notebooks</h1>
-                    <p style={{ fontSize: "14px", color: "#9ca3af", margin: "4px 0 0" }}>Manage your preparation modules and read notes</p>
+                    <h1 style={{ fontSize: "32px", fontWeight: 800, color: "white", margin: 0, letterSpacing: "-0.02em", display: "flex", alignItems: "center", gap: "12px" }}>
+                        <ClipboardList className="text-brand-500" size={32} /> Daily Tasks
+                    </h1>
+                    <p style={{ fontSize: "14px", color: "#9ca3af", margin: "4px 0 0" }}>Manage your preparation modules, tasks, and notes</p>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
                     <div style={{ position: "relative" }}>
                         <Search size={16} color="#9ca3af" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
                         <input
                             type="text"
-                            placeholder="Search notebooks..."
+                            placeholder="Search tasks..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             style={{ background: "#1f2937", border: "1px solid #374151", color: "white", padding: "8px 16px 8px 36px", borderRadius: "8px", fontSize: "14px", outline: "none", width: "220px", transition: "border-color .2s" }}
@@ -148,7 +167,7 @@ const Topics = () => {
                         />
                     </div>
                     <button onClick={openAddModal} className="btn-primary" style={{ display: "flex", alignItems: "center", gap: "6px", height: "38px" }}>
-                        <Plus size={16} /> New Notebook
+                        <Plus size={16} /> New Task
                     </button>
                 </div>
             </div>
@@ -156,7 +175,7 @@ const Topics = () => {
             {/* Subject Filter Tabs */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", borderBottom: "1px solid #374151", paddingBottom: "16px", marginBottom: "24px" }}>
                 {["All", ...SUBJECTS].map(sub => (
-                    <button key={sub} onClick={() => setActiveSubject(sub)}
+                    <button key={sub} onClick={() => handleSubjectChange(sub)}
                         style={{
                             padding: "8px 16px", borderRadius: "8px", fontSize: "14px", fontWeight: 600, border: "none", cursor: "pointer", transition: "all .2s",
                             background: activeSubject === sub ? "#1f2937" : "transparent", color: activeSubject === sub ? "white" : "#9ca3af"
@@ -230,7 +249,7 @@ const Topics = () => {
                                                     <button style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "10px", background: "#1f2937", border: "1px solid #374151", borderRadius: "10px", color: "white", fontSize: "14px", fontWeight: 600, cursor: "pointer", transition: "all .2s" }}
                                                         onMouseEnter={e => { e.currentTarget.style.background = "#374151"; e.currentTarget.style.borderColor = "#4b5563"; }}
                                                         onMouseLeave={e => { e.currentTarget.style.background = "#1f2937"; e.currentTarget.style.borderColor = "#374151"; }}>
-                                                        <BookOpen size={16} /> Open Notebook
+                                                        <BookOpen size={16} /> Open Task
                                                     </button>
                                                 </Link>
 
@@ -247,7 +266,7 @@ const Topics = () => {
             {/* Add / Edit Modal */}
             <AnimatePresence>
                 {showModal && (
-                    <Modal title={editTopic ? "Edit Module Info" : "New Notebook Module"} onClose={() => setShowModal(false)}>
+                    <Modal title={editTopic ? "Edit Task Info" : "New Daily Task"} onClose={() => setShowModal(false)}>
                         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                             {!editTopic && (
                                 <>
@@ -285,7 +304,7 @@ const Topics = () => {
                             {error && <p style={{ color: "#f87171", fontSize: "13px", margin: 0 }}>{error}</p>}
                             <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
                                 <button onClick={() => setShowModal(false)} className="btn-secondary" style={{ flex: 1 }}>Cancel</button>
-                                <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 1 }}>{saving ? "Saving..." : editTopic ? "Update Settings" : "Create Notebook"}</button>
+                                <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 1 }}>{saving ? "Saving..." : editTopic ? "Update Task" : "Create Task"}</button>
                             </div>
                         </div>
                     </Modal>
