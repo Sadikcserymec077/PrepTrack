@@ -270,3 +270,29 @@ html.dark body {
 .dark .section-title {
   color: #e5e7eb;
 }
+
+/* ─── ReactQuill Dark Mode Overrides ─────────────────────────── */
+.dark .ql-editor code {
+  background-color: #1f2937 !important;
+  color: #fca5a5;
+  border: 1px solid #374151;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.dark .ql-editor pre {
+  background-color: #111827 !important;
+  color: #e2e8f0;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.dark .ql-toolbar.ql-snow {
+  border-color: #374151;
+  background-color: #111827;
+}
+
+.dark .ql-container.ql-snow {
+  border-color: #374151;
+}

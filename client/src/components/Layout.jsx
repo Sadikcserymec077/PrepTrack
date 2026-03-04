@@ -2,15 +2,12 @@ import React, { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
 import {
     LayoutDashboard,
     BookOpen,
     Calendar,
     Trophy,
     LogOut,
-    Sun,
-    Moon,
     Menu,
     X,
     GraduationCap,
@@ -25,7 +22,6 @@ const navItems = [
 
 const Layout = () => {
     const { currentUser, logout } = useAuth();
-    const { isDark, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -77,13 +73,6 @@ const Layout = () => {
                         <p className="text-xs text-gray-400 truncate">{currentUser?.email}</p>
                     </div>
                 </div>
-                <button
-                    onClick={toggleTheme}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
-                >
-                    {isDark ? <Sun size={16} /> : <Moon size={16} />}
-                    {isDark ? "Light Mode" : "Dark Mode"}
-                </button>
                 <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"

@@ -3,24 +3,13 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-    const [isDark, setIsDark] = useState(() => {
-        const saved = localStorage.getItem("preptrack-theme");
-        return saved ? saved === "dark" : true; // default to dark
-    });
-
     useEffect(() => {
-        localStorage.setItem("preptrack-theme", isDark ? "dark" : "light");
-        if (isDark) {
-            document.documentElement.classList.add("dark");
-        } else {
-            document.documentElement.classList.remove("dark");
-        }
-    }, [isDark]);
-
-    const toggleTheme = () => setIsDark((prev) => !prev);
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("preptrack-theme", "dark");
+    }, []);
 
     return (
-        <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+        <ThemeContext.Provider value={{ isDark: true, toggleTheme: () => { } }}>
             {children}
         </ThemeContext.Provider>
     );
