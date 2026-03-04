@@ -9,9 +9,10 @@ import {
     Trophy,
     LogOut,
     Menu,
-    X,
     GraduationCap,
+    Search,
 } from "lucide-react";
+import api from "../utils/api";
 
 const navItems = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -24,6 +25,32 @@ const Layout = () => {
     const { currentUser, logout } = useAuth();
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearching, setIsSearching] = useState(false);
+
+    const handleSearch = async (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        if (query.trim().length < 2) {
+            setSearchResults([]);
+            return;
+        }
+        setIsSearching(true);
+        try {
+            const res = await api.get('/api/topics');
+            const filtered = res.data.filter(t =>
+                t.topicName.toLowerCase().includes(query.toLowerCase()) ||
+                t.subjectName.toLowerCase().includes(query.toLowerCase()) ||
+                (t.notesHTML && t.notesHTML.toLowerCase().includes(query.toLowerCase()))
+            );
+            setSearchResults(filtered);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsSearching(false);
+        }
+    };
 
     const handleLogout = async () => {
         await logout();
@@ -130,6 +157,40 @@ const Layout = () => {
                             <GraduationCap size={16} className="text-white" />
                         </div>
                         <span className="font-bold text-gray-800 dark:text-white">PrepTrack</span>
+                    </div>
+                </header>
+
+                {/* Desktop Top Bar (Search) */}
+                <header className="hidden lg:flex items-center justify-end px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                    <div className="relative w-96">
+                        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search your notes, topics, code..."
+                            value={searchQuery}
+                            onChange={handleSearch}
+                            className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-brand-500 transition-colors"
+                        />
+                        {searchQuery.trim().length >= 2 && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto">
+                                {isSearching ? (
+                                    <div className="p-4 text-center text-sm text-gray-500">Searching...</div>
+                                ) : searchResults.length > 0 ? (
+                                    searchResults.map(topic => (
+                                        <button
+                                            key={topic._id}
+                                            onClick={() => { navigate(`/topics/${topic._id}`); setSearchQuery(""); setSearchResults([]); }}
+                                            className="w-full text-left p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 last:border-0 transition-colors"
+                                        >
+                                            <div className="font-semibold text-gray-800 dark:text-white text-sm">{topic.topicName}</div>
+                                            <div className="text-xs text-gray-500 mt-1">{topic.subjectName}</div>
+                                        </button>
+                                    ))
+                                ) : (
+                                    <div className="p-4 text-center text-sm text-gray-500">No matching notes found.</div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </header>
 

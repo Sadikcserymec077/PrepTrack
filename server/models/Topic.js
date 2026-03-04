@@ -23,6 +23,7 @@ const TopicSchema = new mongoose.Schema({
     // Rich Text Notes
     notesHTML: { type: String, default: "" }, // Main Concept Notes
     youtubeUrl: { type: String, default: "" }, // Embedded YouTube video link
+    isImportant: { type: Boolean, default: false }, // Feature 7: Bookmark System
 
     // Revision System
     revisionNotesHTML: { type: String, default: "" }, // Quick Summary
@@ -41,6 +42,9 @@ const TopicSchema = new mongoose.Schema({
         youtubeUrl: { type: String, default: "" },
         input: { type: String, default: "" },
         output: { type: String, default: "" },
+        platform: { type: String, enum: ["LeetCode", "GeeksforGeeks", "HackerRank", "Codeforces", "Custom", ""], default: "Custom" },
+        timeTaken: { type: Number, default: 0 }, // Tracking minutes took
+        status: { type: String, enum: ["Solved", "Attempted", "Unsolved"], default: "Solved" },
         dateAdded: { type: Date, default: Date.now }
     }],
 

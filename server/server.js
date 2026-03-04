@@ -48,6 +48,9 @@ app.use("/api/topics", require("./routes/topics"));
 app.use("/api/progress", require("./routes/progress"));
 app.use("/api/calendar", require("./routes/calendar"));
 app.use("/api/ai", require("./routes/ai"));
+app.use("/api/planner", require("./routes/planner"));
+app.use("/api/mocktests", require("./routes/mocktests"));
+app.use("/api/snippets", require("./routes/snippets"));
 
 // ─── Health Check ─────────────────────────────────────────────
 app.get("/", (req, res) => {

@@ -20,8 +20,19 @@ const getDashboardData = async (req, res) => {
         let weakTopics = [];
         let moderateTopics = [];
         let subjectsData = {}; // For Bar Chart
+        let revisionList = []; // Smart Revision
+
+        const today = new Date();
 
         topics.forEach(topic => {
+            const lastDate = topic.lastRevised || topic.createdAt;
+            const diffDays = Math.floor((today - new Date(lastDate)) / (1000 * 60 * 60 * 24));
+
+            // Need revision at day 1, 3, 7, 15
+            if (diffDays >= 1 && diffDays <= 2 && topic.revisionCount === 0) revisionList.push(topic);
+            else if (diffDays >= 3 && diffDays <= 6 && topic.revisionCount === 1) revisionList.push(topic);
+            else if (diffDays >= 7 && diffDays <= 14 && topic.revisionCount === 2) revisionList.push(topic);
+            else if (diffDays >= 15 && topic.revisionCount >= 3) revisionList.push(topic);
             totalQuestionsSolved += topic.solvedQuestions;
 
             // Calculate completion based on questions solved mapping to completeness
@@ -65,7 +76,8 @@ const getDashboardData = async (req, res) => {
             },
             topicsBreakdown: {
                 weakTopics: weakTopics.map(t => ({ id: t._id, name: t.topicName, subject: t.subjectName, accuracy: t.accuracy })),
-                strongTopics: strongTopics.map(t => ({ id: t._id, name: t.topicName, subject: t.subjectName, accuracy: t.accuracy }))
+                strongTopics: strongTopics.map(t => ({ id: t._id, name: t.topicName, subject: t.subjectName, accuracy: t.accuracy })),
+                revisionTargets: revisionList.map(t => ({ id: t._id, name: t.topicName, subject: t.subjectName, lastRevised: t.lastRevised || t.createdAt }))
             }
         });
 

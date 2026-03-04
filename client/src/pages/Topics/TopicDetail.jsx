@@ -5,7 +5,9 @@ import "react-quill-new/dist/quill.snow.css";
 import { motion } from "framer-motion";
 import api from "../../utils/api";
 import CodeEditor from "../../components/CodeEditor";
-import { ArrowLeft, CheckCircle2, RotateCcw, Clock, Target, CalendarDays, Loader2, Save, Youtube, Plus, Trash2, Sparkles } from "lucide-react";
+import { ArrowLeft, CheckCircle2, RotateCcw, Clock, Target, CalendarDays, Loader2, Save, Youtube, Plus, Trash2, Sparkles, Download, Star } from "lucide-react";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 
 const DIFFICULTY_COLOR = { "Easy": "#4ade80", "Medium": "#facc15", "Hard": "#f87171" };
 
@@ -124,9 +126,37 @@ const TopicDetail = () => {
     };
 
     const addNewQuestion = () => {
-        const newQ = { title: "Untitled Problem", difficulty: "Medium", approachHTML: "", edgeCasesHTML: "", codeSolution: "", codeLanguage: 71, youtubeUrl: "", input: "", output: "" };
+        const newQ = { title: "Untitled Problem", difficulty: "Medium", approachHTML: "", edgeCasesHTML: "", codeSolution: "", codeLanguage: 71, youtubeUrl: "", input: "", output: "", platform: "Custom", timeTaken: 0, status: "Attempted" };
         setFormData(prev => ({ ...prev, questions: [newQ, ...prev.questions] }));
         setActiveQIndex(0);
+    };
+
+    const toggleImportant = async () => {
+        try {
+            const res = await api.put(`/api/topics/${id}`, { isImportant: !topic.isImportant });
+            setTopic(res.data);
+        } catch (err) {
+            console.error("Failed to toggle important", err);
+        }
+    };
+
+    const exportToPDF = async () => {
+        const element = document.getElementById("topic-pdf-content");
+        if (!element) return;
+        setSaving(true);
+        try {
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", "a4");
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+            pdf.save(`${topic.topicName.replace(/\s+/g, "_")}_Notes.pdf`);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setSaving(false);
+        }
     };
 
     const updateActiveQuestion = (field, value) => {
@@ -177,6 +207,9 @@ const TopicDetail = () => {
                 </button>
                 <div className="flex items-center gap-4 flex-wrap">
                     {lastSavedTime && <span className="text-gray-500 text-xs hidden sm:inline">Last saved: {lastSavedTime}</span>}
+                    <button onClick={exportToPDF} className="flex items-center gap-2 text-sm text-gray-300 hover:text-white px-3 py-2 bg-gray-800 rounded-lg transition-colors">
+                        <Download size={16} /> <span className="hidden sm:inline">Export PDF</span>
+                    </button>
                     <button onClick={handleSave} disabled={saving} className="btn-primary flex items-center gap-2 whitespace-nowrap text-sm px-4 py-2">
                         {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                         {saving ? "Saving..." : "Save Notes"}
@@ -194,11 +227,17 @@ const TopicDetail = () => {
                         {formData.difficultyLevel}
                     </span>
                 </div>
-                <h1 className="topic-title">
-                    {topic.topicName}
-                </h1>
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                    <h1 className="topic-title m-0 p-0 flex-1 min-w-[250px]">
+                        {topic.topicName}
+                    </h1>
+                    <button onClick={toggleImportant} className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${topic.isImportant ? "bg-yellow-500/20 text-yellow-500 border border-yellow-500/50" : "bg-gray-800 text-gray-400 border border-gray-700 hover:text-white"}`}>
+                        <Star size={16} className={topic.isImportant ? "fill-yellow-500" : ""} />
+                        {topic.isImportant ? "Important" : "Mark Important"}
+                    </button>
+                </div>
 
-                <div style={{ display: "flex", gap: "32px", color: "#9ca3af", fontSize: "14px", fontWeight: 500 }}>
+                <div style={{ display: "flex", gap: "32px", color: "#9ca3af", fontSize: "14px", fontWeight: 500, marginTop: "16px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}><CalendarDays size={16} /> Created: {new Date(topic.createdAt).toLocaleDateString()}</div>
                     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}><RotateCcw size={16} /> Revisions: {topic.revisionCount}</div>
                 </div>
@@ -220,7 +259,7 @@ const TopicDetail = () => {
             </div>
 
             {/* ─── Editor Viewport ─── */}
-            <div className="notion-editor-wrapper">
+            <div className="notion-editor-wrapper" id="topic-pdf-content">
 
                 {/* TAB: Concept Notes */}
                 {activeTab === "notes" && (
@@ -292,8 +331,19 @@ const TopicDetail = () => {
                                         {/* Problem Header */}
                                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap", borderBottom: "1px solid #374151", paddingBottom: "16px" }}>
                                             <input type="text" value={q.title} onChange={e => updateActiveQuestion("title", e.target.value)} placeholder="Problem Title..." style={{ background: "transparent", border: "none", color: "white", fontSize: "24px", fontWeight: 800, outline: "none", flex: 1, minWidth: "200px" }} />
-                                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                                <select value={q.difficulty} onChange={e => updateActiveQuestion("difficulty", e.target.value)} style={{ background: "#1f2937", color: "white", border: "1px solid #374151", padding: "6px 16px", borderRadius: "6px", outline: "none", fontSize: "13px", height: "36px" }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                                                <select value={q.platform} onChange={e => updateActiveQuestion("platform", e.target.value)} style={{ background: "#1f2937", color: "white", border: "1px solid #374151", padding: "6px 12px", borderRadius: "6px", outline: "none", fontSize: "13px" }}>
+                                                    <option value="LeetCode">LeetCode</option><option value="GeeksforGeeks">GeeksforGeeks</option>
+                                                    <option value="HackerRank">HackerRank</option><option value="Codeforces">Codeforces</option><option value="Custom">Custom</option>
+                                                </select>
+                                                <select value={q.status} onChange={e => updateActiveQuestion("status", e.target.value)} style={{ background: "#1f2937", color: q.status === "Solved" ? "#4ade80" : "#fca5a5", border: "1px solid #374151", padding: "6px 12px", borderRadius: "6px", outline: "none", fontSize: "13px", fontWeight: "bold" }}>
+                                                    <option value="Solved">Solved</option><option value="Attempted">Attempted</option><option value="Unsolved">Unsolved</option>
+                                                </select>
+                                                <div style={{ display: "flex", alignItems: "center", background: "#1f2937", border: "1px solid #374151", borderRadius: "6px", padding: "4px 8px" }}>
+                                                    <Clock size={14} className="text-gray-400 mr-2" />
+                                                    <input type="number" placeholder="Mins" value={q.timeTaken} onChange={e => updateActiveQuestion("timeTaken", parseInt(e.target.value) || 0)} style={{ background: "transparent", border: "none", outline: "none", color: "white", width: "50px", fontSize: "13px" }} />
+                                                </div>
+                                                <select value={q.difficulty} onChange={e => updateActiveQuestion("difficulty", e.target.value)} style={{ background: "#1f2937", color: "white", border: "1px solid #374151", padding: "6px 12px", borderRadius: "6px", outline: "none", fontSize: "13px" }}>
                                                     <option value="Easy">Easy</option><option value="Medium">Medium</option><option value="Hard">Hard</option>
                                                 </select>
                                                 <button onClick={() => deleteQuestion(activeQIndex)} style={{ background: "#7f1d1d", color: "#fca5a5", border: "none", width: "36px", height: "36px", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "6px", cursor: "pointer", transition: "all .2s" }} onMouseEnter={e => e.currentTarget.style.opacity = 0.8} onMouseLeave={e => e.currentTarget.style.opacity = 1}><Trash2 size={16} /></button>

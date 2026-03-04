@@ -9,8 +9,9 @@ import api from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 import {
     BookOpen, CheckCircle2, Clock, Flame, Target,
-    TrendingUp, AlertTriangle, Download,
+    TrendingUp, AlertTriangle, Download, Calendar, ArrowRight, ListTodo, Plus, Trash2
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { jsPDF } from "jspdf";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement);
@@ -41,19 +42,53 @@ const StatCard = ({ icon: Icon, label, value, color, delay }) => (
 const Dashboard = () => {
     const { currentUser, mongoUser } = useAuth();
     const [data, setData] = useState(null);
+    const [plan, setPlan] = useState(null);
+    const [newTaskTitle, setNewTaskTitle] = useState("");
     const [loading, setLoading] = useState(true);
     const quote = QUOTES[new Date().getDay() % QUOTES.length];
 
     const fetchDashboard = useCallback(async () => {
         try {
-            const res = await api.get("/api/progress/dashboard");
+            const [res, planRes] = await Promise.all([
+                api.get("/api/progress/dashboard"),
+                api.get("/api/planner/today")
+            ]);
             setData(res.data);
+            setPlan(planRes.data);
         } catch (err) {
             console.error("Dashboard fetch error:", err);
         } finally {
             setLoading(false);
         }
     }, []);
+
+    const handleAddTask = async (e) => {
+        e.preventDefault();
+        if (!newTaskTitle.trim() || !plan) return;
+        try {
+            const updatedTasks = [...plan.tasks, { title: newTaskTitle, isCompleted: false, category: "Other" }];
+            const res = await api.put(`/api/planner/${plan._id}`, { tasks: updatedTasks });
+            setPlan(res.data);
+            setNewTaskTitle("");
+        } catch (err) { console.error(err); }
+    };
+
+    const toggleTask = async (index) => {
+        try {
+            const updatedTasks = [...plan.tasks];
+            updatedTasks[index].isCompleted = !updatedTasks[index].isCompleted;
+            const res = await api.put(`/api/planner/${plan._id}`, { tasks: updatedTasks });
+            setPlan(res.data);
+        } catch (err) { console.error(err); }
+    };
+
+    const removeTask = async (index) => {
+        try {
+            const updatedTasks = plan.tasks.filter((_, i) => i !== index);
+            const res = await api.put(`/api/planner/${plan._id}`, { tasks: updatedTasks });
+            setPlan(res.data);
+        } catch (err) { console.error(err); }
+    };
 
     useEffect(() => { fetchDashboard(); }, [fetchDashboard]);
 
@@ -157,6 +192,32 @@ const Dashboard = () => {
                 <StatCard icon={AlertTriangle} label="Weak Topics" value={data?.chartsInfo.strongWeakCounts.weak ?? 0} color="bg-red-500" delay={0.45} />
             </div>
 
+            {/* Smart Study Planner */}
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48 }} className="card pb-4">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="section-title mb-0 flex items-center gap-2"><ListTodo size={20} className="text-brand-500" /> Today's Study Planner</h2>
+                    <span className="text-xs text-gray-400">{plan?.tasks.filter(t => t.isCompleted).length || 0} / {plan?.tasks.length || 0} completed</span>
+                </div>
+                <div className="space-y-2 mb-4 max-h-48 overflow-y-auto">
+                    {plan?.tasks.length === 0 && <p className="text-sm text-gray-500 text-center py-4">No tasks planned for today. Add one below!</p>}
+                    {plan?.tasks.map((task, i) => (
+                        <div key={i} className={`flex items-center justify-between p-3 rounded-xl border ${task.isCompleted ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'} transition-all`}>
+                            <div className="flex items-center gap-3 flex-1 cursor-pointer" onClick={() => toggleTask(i)}>
+                                <div className={`w-5 h-5 rounded border flex flex-shrink-0 items-center justify-center ${task.isCompleted ? 'bg-emerald-500 border-emerald-500' : 'border-gray-400'}`}>
+                                    {task.isCompleted && <CheckCircle2 size={12} className="text-white" />}
+                                </div>
+                                <span className={`text-sm ${task.isCompleted ? 'text-gray-500 line-through' : 'text-gray-800 dark:text-white'}`}>{task.title}</span>
+                            </div>
+                            <button onClick={() => removeTask(i)} className="text-gray-400 hover:text-red-500 transition-colors p-1"><Trash2 size={16} /></button>
+                        </div>
+                    ))}
+                </div>
+                <form onSubmit={handleAddTask} className="flex gap-2 relative">
+                    <input type="text" value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} placeholder="e.g. Solve 5 array problems..." className="flex-1 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-sm text-gray-800 dark:text-white rounded-xl px-4 py-2 outline-none focus:border-brand-500" />
+                    <button type="submit" disabled={!newTaskTitle.trim()} className="bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white p-2 rounded-xl transition-all"><Plus size={20} /></button>
+                </form>
+            </motion.div>
+
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }} className="card">
@@ -196,6 +257,30 @@ const Dashboard = () => {
                                 <span className="text-xs text-red-500 ml-1">({t.subject})</span>
                                 <span className="badge-weak ml-2">{t.accuracy}%</span>
                             </div>
+                        ))}
+                    </div>
+                </motion.div>
+            )}
+
+            {/* Smart Revision List Alert */}
+            {data?.topicsBreakdown.revisionTargets?.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="card border-l-4 border-blue-500">
+                    <div className="flex items-center gap-2 mb-3">
+                        <Calendar size={18} className="text-blue-500" />
+                        <h2 className="section-title mb-0">📌 Smart Revision (Spaced Repetition)</h2>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-4">These topics are due for a structured revision today based on your memory curve.</p>
+                    <div className="flex flex-wrap gap-3">
+                        {data.topicsBreakdown.revisionTargets.map(t => (
+                            <Link to={`/topics/${t.id}`} key={t.id} className="group bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3 flex items-center justify-between gap-4 hover:border-blue-500 hover:bg-blue-900/20 transition-all cursor-pointer">
+                                <div>
+                                    <div className="text-sm font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-2">
+                                        {t.name}
+                                    </div>
+                                    <div className="text-xs text-blue-500/80 mt-1">({t.subject})</div>
+                                </div>
+                                <ArrowRight size={16} className="text-blue-500 opacity-50 group-hover:opacity-100 transition-opacity" />
+                            </Link>
                         ))}
                     </div>
                 </motion.div>
