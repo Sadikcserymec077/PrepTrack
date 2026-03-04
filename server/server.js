@@ -10,10 +10,13 @@ const PORT = process.env.PORT || 5000;
 // ─── CORS — allow all localhost ports for development ────────
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (Postman, curl) or any localhost
-        if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) {
-            callback(null, true);
-        } else if (origin === process.env.CLIENT_URL) {
+        // Allow requests with no origin (Postman, curl), localhost, any vercel.app, or explicit CLIENT_URL
+        if (
+            !origin ||
+            /^http:\/\/localhost:\d+$/.test(origin) ||
+            origin.endsWith('.vercel.app') ||
+            origin === process.env.CLIENT_URL
+        ) {
             callback(null, true);
         } else {
             callback(new Error(`CORS: origin ${origin} not allowed`));
