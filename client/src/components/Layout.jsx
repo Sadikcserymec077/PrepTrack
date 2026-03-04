@@ -11,17 +11,18 @@ import {
     Menu,
     GraduationCap,
     Search,
-    Brain, Calculator, Lightbulb, BookText, Database
+    Brain, Calculator, Lightbulb, BookText, Database, ListTodo, BookOpen
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import api from "../utils/api";
 
 const mainNav = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/topics", label: "Daily Task", icon: BookOpen },
+    { to: "/daily-tasks", label: "Daily Tasks", icon: ListTodo },
 ];
 
 const subjectNav = [
+    { to: "/topics", label: "All Subjects", match: "", icon: BookOpen, color: "text-blue-500" },
     { to: "/topics?subject=DSA", label: "DSA", match: "?subject=DSA", icon: Database, color: "text-indigo-500" },
     { to: "/topics?subject=Aptitude", label: "Aptitude", match: "?subject=Aptitude", icon: Calculator, color: "text-emerald-500" },
     { to: "/topics?subject=Logical Reasoning", match: "?subject=Logical Reasoning", label: "Logical Reasoning", icon: Brain, color: "text-violet-500" },

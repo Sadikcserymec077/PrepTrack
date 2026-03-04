@@ -10,6 +10,7 @@ import Topics from "./pages/Topics/Topics";
 import TopicDetail from "./pages/Topics/TopicDetail";
 import CalendarPage from "./pages/Calendar/CalendarPage";
 import Ranking from "./pages/Ranking/Ranking";
+import DailyTasks from "./pages/DailyTasks/DailyTasks";
 import Layout from "./components/Layout";
 
 // Error boundary to catch runtime crashes and show a message instead of blank page
@@ -70,6 +71,7 @@ function AppRoutes() {
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="daily-tasks" element={<DailyTasks />} />
         <Route path="topics" element={<Topics />} />
         <Route path="topics/:id" element={<TopicDetail />} />
         <Route path="calendar" element={<CalendarPage />} />

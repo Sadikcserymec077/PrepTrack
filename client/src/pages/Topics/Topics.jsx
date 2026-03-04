@@ -149,16 +149,16 @@ const Topics = () => {
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", flexWrap: "wrap", gap: "16px" }}>
                 <div>
                     <h1 style={{ fontSize: "32px", fontWeight: 800, color: "white", margin: 0, letterSpacing: "-0.02em", display: "flex", alignItems: "center", gap: "12px" }}>
-                        <ClipboardList className="text-brand-500" size={32} /> Daily Tasks
+                        <BookOpen className="text-brand-500" size={32} /> Subject Modules
                     </h1>
-                    <p style={{ fontSize: "14px", color: "#9ca3af", margin: "4px 0 0" }}>Manage your preparation modules, tasks, and notes</p>
+                    <p style={{ fontSize: "14px", color: "#9ca3af", margin: "4px 0 0" }}>Manage your preparation modules, topics, and notes</p>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
                     <div style={{ position: "relative" }}>
                         <Search size={16} color="#9ca3af" style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)" }} />
                         <input
                             type="text"
-                            placeholder="Search tasks..."
+                            placeholder="Search topics..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             style={{ background: "#1f2937", border: "1px solid #374151", color: "white", padding: "8px 16px 8px 36px", borderRadius: "8px", fontSize: "14px", outline: "none", width: "220px", transition: "border-color .2s" }}
@@ -167,7 +167,7 @@ const Topics = () => {
                         />
                     </div>
                     <button onClick={openAddModal} className="btn-primary" style={{ display: "flex", alignItems: "center", gap: "6px", height: "38px" }}>
-                        <Plus size={16} /> New Task
+                        <Plus size={16} /> New Module
                     </button>
                 </div>
             </div>
@@ -249,7 +249,7 @@ const Topics = () => {
                                                     <button style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", padding: "10px", background: "#1f2937", border: "1px solid #374151", borderRadius: "10px", color: "white", fontSize: "14px", fontWeight: 600, cursor: "pointer", transition: "all .2s" }}
                                                         onMouseEnter={e => { e.currentTarget.style.background = "#374151"; e.currentTarget.style.borderColor = "#4b5563"; }}
                                                         onMouseLeave={e => { e.currentTarget.style.background = "#1f2937"; e.currentTarget.style.borderColor = "#374151"; }}>
-                                                        <BookOpen size={16} /> Open Task
+                                                        <BookOpen size={16} /> Open Topic
                                                     </button>
                                                 </Link>
 
@@ -266,7 +266,7 @@ const Topics = () => {
             {/* Add / Edit Modal */}
             <AnimatePresence>
                 {showModal && (
-                    <Modal title={editTopic ? "Edit Task Info" : "New Daily Task"} onClose={() => setShowModal(false)}>
+                    <Modal title={editTopic ? "Edit Module Info" : "New Subject Module"} onClose={() => setShowModal(false)}>
                         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                             {!editTopic && (
                                 <>
@@ -304,7 +304,7 @@ const Topics = () => {
                             {error && <p style={{ color: "#f87171", fontSize: "13px", margin: 0 }}>{error}</p>}
                             <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
                                 <button onClick={() => setShowModal(false)} className="btn-secondary" style={{ flex: 1 }}>Cancel</button>
-                                <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 1 }}>{saving ? "Saving..." : editTopic ? "Update Task" : "Create Task"}</button>
+                                <button onClick={handleSave} disabled={saving} className="btn-primary" style={{ flex: 1 }}>{saving ? "Saving..." : editTopic ? "Update Module" : "Create Module"}</button>
                             </div>
                         </div>
                     </Modal>
