@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const MockTestSchema = new mongoose.Schema({
     userId: { type: String, required: true },
-    type: { type: String, enum: ["DSA", "numerical ability", "Logical Reasoning", "Verbal", "Other"], required: true },
+    type: { type: String, required: true },
     title: { type: String, required: true },
     score: { type: Number, required: true },
     totalScore: { type: Number, required: true },

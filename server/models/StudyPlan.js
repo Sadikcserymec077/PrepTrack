@@ -6,7 +6,7 @@ const StudyPlanSchema = new mongoose.Schema({
     tasks: [{
         title: { type: String, required: true },
         isCompleted: { type: Boolean, default: false },
-        category: { type: String, enum: ["DSA", "numerical ability", "Revision", "Other"], default: "Other" }
+        category: { type: String, default: "Other" }
     }]
 }, { timestamps: true });
 
