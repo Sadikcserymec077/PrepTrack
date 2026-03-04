@@ -124,7 +124,7 @@ const TopicDetail = () => {
     };
 
     const addNewQuestion = () => {
-        const newQ = { title: "Untitled Problem", difficulty: "Medium", approachHTML: "", edgeCasesHTML: "", codeSolution: "", youtubeUrl: "" };
+        const newQ = { title: "Untitled Problem", difficulty: "Medium", approachHTML: "", edgeCasesHTML: "", codeSolution: "", codeLanguage: 71, youtubeUrl: "", input: "", output: "" };
         setFormData(prev => ({ ...prev, questions: [newQ, ...prev.questions] }));
         setActiveQIndex(0);
     };
@@ -353,7 +353,12 @@ const TopicDetail = () => {
 
                                             <div style={{ margin: "0 -16px", borderTop: "1px dashed #374151", paddingTop: "24px" }}>
                                                 <h3 style={{ color: "white", marginBottom: "16px", fontWeight: 700, fontSize: "16px", padding: "0 16px" }}>💻 Code Editor</h3>
-                                                <CodeEditor initialCode={q.codeSolution} onCodeChange={val => updateActiveQuestion("codeSolution", val)} />
+                                                <CodeEditor
+                                                    initialCode={q.codeSolution}
+                                                    initialLanguage={q.codeLanguage}
+                                                    onLanguageChange={val => updateActiveQuestion("codeLanguage", val)}
+                                                    onCodeChange={val => updateActiveQuestion("codeSolution", val)}
+                                                />
                                             </div>
                                         </div>
                                     </motion.div>

@@ -24,9 +24,10 @@ const STATUS_COLORS = {
     stderr: { bg: "rgba(245,158,11,.1)", border: "#f59e0b", text: "#fcd34d", icon: XCircle },
 };
 
-const CodeEditor = ({ initialCode = "", onCodeChange, topicName = "" }) => {
-    const [selectedLang, setSelectedLang] = useState(LANGUAGES[0]);
-    const [code, setCode] = useState(initialCode || selectedLang.boilerplate);
+const CodeEditor = ({ initialCode = "", initialLanguage = 71, onCodeChange, onLanguageChange, topicName = "" }) => {
+    const defaultLang = LANGUAGES.find(l => l.id === initialLanguage) || LANGUAGES[0];
+    const [selectedLang, setSelectedLang] = useState(defaultLang);
+    const [code, setCode] = useState(initialCode || defaultLang.boilerplate);
     const [stdin, setStdin] = useState("");
     const [output, setOutput] = useState(null);
     const [running, setRunning] = useState(false);
@@ -36,9 +37,18 @@ const CodeEditor = ({ initialCode = "", onCodeChange, topicName = "" }) => {
 
     const handleLangChange = (lang) => {
         setSelectedLang(lang);
-        const newCode = lang.boilerplate;
-        setCode(newCode);
-        if (onCodeChange) onCodeChange(newCode);
+
+        const isCodeEmpty = !code.trim();
+        const isCodeBoilerplate = LANGUAGES.some(l => l.boilerplate.trim() === code.trim());
+
+        if (isCodeEmpty || isCodeBoilerplate) {
+            const newCode = lang.boilerplate;
+            setCode(newCode);
+            if (onCodeChange) onCodeChange(newCode);
+        }
+
+        if (onLanguageChange) onLanguageChange(lang.id);
+
         setShowLangMenu(false);
         setOutput(null);
     };

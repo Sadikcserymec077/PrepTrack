@@ -37,6 +37,7 @@ const TopicSchema = new mongoose.Schema({
         approachHTML: { type: String, default: "" },
         edgeCasesHTML: { type: String, default: "" },
         codeSolution: { type: String, default: "" },
+        codeLanguage: { type: Number, default: 71 }, // 71 represents Python by default
         youtubeUrl: { type: String, default: "" },
         input: { type: String, default: "" },
         output: { type: String, default: "" },
