@@ -11,7 +11,7 @@ import {
     Menu,
     GraduationCap,
     Search,
-    Brain, Calculator, Lightbulb, BookText, Database, ListTodo, BookOpen
+    Brain, Calculator, Lightbulb, BookText, Database, ListTodo
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import api from "../utils/api";
