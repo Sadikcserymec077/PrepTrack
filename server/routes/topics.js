@@ -34,7 +34,7 @@ router.get("/:id", verifyToken, async (req, res) => {
 router.post("/", verifyToken, async (req, res) => {
     try {
         const {
-            subjectName, topicName, difficultyLevel,
+            subjectName, topicName, problemStatement, difficultyLevel,
             notesHTML, revisionNotesHTML, images, youtubeUrl, questions
         } = req.body;
 
@@ -47,6 +47,7 @@ router.post("/", verifyToken, async (req, res) => {
             userId: req.user.uid,
             subjectName,
             topicName,
+            problemStatement: problemStatement || "",
             difficultyLevel: difficultyLevel || "Medium",
             notesHTML: notesHTML || "",
             revisionNotesHTML: revisionNotesHTML || "",
@@ -69,7 +70,7 @@ router.post("/", verifyToken, async (req, res) => {
 router.put("/:id", verifyToken, async (req, res) => {
     try {
         const {
-            notesHTML, revisionNotesHTML, images, isRevised, difficultyLevel, youtubeUrl, questions
+            notesHTML, revisionNotesHTML, images, isRevised, difficultyLevel, youtubeUrl, questions, problemStatement
         } = req.body;
 
         const topic = await Topic.findOne({ _id: req.params.id, userId: req.user.uid });
@@ -81,6 +82,7 @@ router.put("/:id", verifyToken, async (req, res) => {
         if (youtubeUrl !== undefined) topic.youtubeUrl = youtubeUrl;
         if (images !== undefined) topic.images = images;
         if (questions !== undefined) topic.questions = questions;
+        if (problemStatement !== undefined) topic.problemStatement = problemStatement;
 
         if (isRevised !== undefined) {
             topic.isRevised = isRevised;

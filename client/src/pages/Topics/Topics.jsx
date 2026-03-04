@@ -38,7 +38,7 @@ const KNOWN_TOPICS = [
     "Operating Systems (OS)", "Database Management (DBMS)", "Computer Networks (CN)", "Object Oriented Programming (OOPs)"
 ];
 
-const defaultForm = { subjectName: "DSA", topicName: "", difficultyLevel: "Medium" };
+const defaultForm = { subjectName: "DSA", topicName: "", problemStatement: "", difficultyLevel: "Medium" };
 
 const Modal = ({ title, onClose, children }) => (
     <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
@@ -103,7 +103,7 @@ const Topics = () => {
         setSaving(true); setError("");
         try {
             if (editTopic) {
-                const res = await api.put(`/api/topics/${editTopic._id}`, { difficultyLevel: form.difficultyLevel });
+                const res = await api.put(`/api/topics/${editTopic._id}`, { difficultyLevel: form.difficultyLevel, problemStatement: form.problemStatement });
                 setTopics(topics.map(t => t._id === editTopic._id ? res.data : t));
             } else {
                 const res = await api.post("/api/topics", form);
@@ -220,6 +220,12 @@ const Topics = () => {
                                                             <span style={{ fontSize: "11px", fontWeight: 600, color: DIFFICULTY_COLOR[topic.difficultyLevel] }}>{topic.difficultyLevel}</span>
                                                         </div>
                                                         <h3 style={{ fontSize: "20px", fontWeight: 800, color: "white", margin: 0, lineHeight: 1.2 }}>{topic.topicName}</h3>
+                                                        {topic.problemStatement && (
+                                                            <p style={{ fontSize: "13px", color: "#d1d5db", margin: "8px 0 0 0" }}>
+                                                                <span style={{ fontWeight: 600, color: "#9ca3af" }}>Problem: </span>
+                                                                {topic.problemStatement}
+                                                            </p>
+                                                        )}
                                                     </div>
                                                     <div style={{ display: "flex", gap: "2px" }}>
                                                         <button onClick={() => openEditModal(topic)} style={{ padding: "6px", background: "none", border: "none", color: "#6b7280", cursor: "pointer", transition: "color .2s" }} onMouseEnter={e => e.currentTarget.style.color = "#white"} onMouseLeave={e => e.currentTarget.style.color = "#6b7280"}><Pencil size={15} /></button>
@@ -292,6 +298,17 @@ const Topics = () => {
                                                 <option key={i} value={t} />
                                             ))}
                                         </datalist>
+                                    </div>
+                                    <div>
+                                        <label className="label">Problem Statement (optional)</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. Reverse a Linked List..."
+                                            value={form.problemStatement}
+                                            onChange={e => setForm({ ...form, problemStatement: e.target.value })}
+                                            className="input"
+                                            autoComplete="off"
+                                        />
                                     </div>
                                 </>
                             )}
