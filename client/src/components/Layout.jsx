@@ -24,7 +24,7 @@ const mainNav = [
 const subjectNav = [
     { to: "/topics", label: "All Subjects", match: "", icon: BookOpen, color: "text-blue-500" },
     { to: "/topics?subject=DSA", label: "DSA", match: "?subject=DSA", icon: Database, color: "text-indigo-500" },
-    { to: "/topics?subject=Aptitude", label: "Aptitude", match: "?subject=Aptitude", icon: Calculator, color: "text-emerald-500" },
+    { to: "/topics?subject=numerical ability", label: "numerical ability", match: "?subject=numerical ability", icon: Calculator, color: "text-emerald-500" },
     { to: "/topics?subject=Logical Reasoning", match: "?subject=Logical Reasoning", label: "Logical Reasoning", icon: Brain, color: "text-violet-500" },
     { to: "/topics?subject=Verbal", label: "Verbal", match: "?subject=Verbal", icon: BookText, color: "text-pink-500" },
     { to: "/topics?subject=Core", label: "Core Subjects", match: "?subject=Core", icon: Lightbulb, color: "text-orange-500" },
