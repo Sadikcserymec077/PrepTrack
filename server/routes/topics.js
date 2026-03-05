@@ -98,7 +98,7 @@ router.put("/:id", verifyToken, async (req, res) => {
         res.json(topic);
     } catch (err) {
         console.error("Error updating topic:", err);
-        res.status(500).json({ error: "Error updating topic" });
+        res.status(500).json({ error: err.message || "Error updating topic" });
     }
 });
 
